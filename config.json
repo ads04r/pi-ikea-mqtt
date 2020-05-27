@@ -1,0 +1,28 @@
+{
+   "mqtt" : {
+      "host" : "127.0.0.1"
+   },
+   "lights" : [
+      {
+         "name" : "Lights",
+         "pins" : [
+            17,
+            18,
+            27
+         ],
+         "payload" : [
+            "off",
+            "on"
+         ],
+         "topics" : {
+            "rgb_state" : "notify/light/rgb",
+            "rgb_command" : "notify/light/rgb/set",
+            "command" : "notify/light/set",
+            "bri_state" : "notify/light/brightness",
+            "bri_command" : "notify/light/brightness/set",
+            "state" : "notify/light"
+         },
+         "host" : "127.0.0.1"
+      }
+   ]
+}
