@@ -25,7 +25,7 @@ def update(config, client, id):
 
 	if host == '':
 		pi = pigpio.pi()
-	else
+	else:
 		pi = pigpio.pi(host)
 	pi.set_PWM_dutycycle(pins[0], r)
 	pi.set_PWM_dutycycle(pins[1], g)
