@@ -17,8 +17,6 @@ def update(config, client, id):
 		host = light['host']
 	pins = light['pins']
 
-	print(state)
-
 	bri = float(state['bri'])
 	onstate = int(state['on'])
 	r = int(float(state['r']) * (bri / 255) * onstate)
