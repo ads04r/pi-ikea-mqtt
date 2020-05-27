@@ -8,11 +8,13 @@ if not(os.path.exists(config_path)):
 	sys.stderr.write("Cannot find config file " + config_path + "\n")
 	sys.exit(1)
 
-def update(config, id):
+def update(config, client, id):
 
 	light = config['lights'][id]
 	state = config['states'][id]
-	host = light['host']
+	host = ''
+	if 'host' in light:
+		host = light['host']
 	pins = light['pins']
 
 	print(state)
@@ -23,11 +25,24 @@ def update(config, id):
 	g = int(float(state['g']) * (bri / 255) * onstate)
 	b = int(float(state['b']) * (bri / 255) * onstate)
 
-	pi = pigpio.pi(host)
+	if host == '':
+		pi = pigpio.pi()
+	else
+		pi = pigpio.pi(host)
 	pi.set_PWM_dutycycle(pins[0], r)
 	pi.set_PWM_dutycycle(pins[1], g)
 	pi.set_PWM_dutycycle(pins[2], b)
 	pi.stop()
+
+	for topic_id in light['topics'].keys():
+		topic = light['topics'][topic_id]
+		if topic_id == 'state':
+			client.publish(topic, light['payload'][onstate])
+		if topic_id == 'bri_state':
+			client.publish(topic, state['bri'])
+		if topic_id == 'rgb_state':
+			rgb_string = str(state['r']) + ',' + str(state['g']) + ',' + str(state['b'])
+			client.publish(topic, rgb_string)
 
 def callback(client, userdata, message):
 
@@ -53,12 +68,20 @@ def callback(client, userdata, message):
 					config['states'][i]['on'] = 1
 			if topic_id == 'bri_command':
 				config['states'][i]['bri'] = int(payload)
+				config['states'][i]['on'] = 1
+			if topic_id == 'rgb_command':
+				col = payload.split(',')
+				if len(col) == 3:
+					config['states'][i]['r'] = int(col[0])
+					config['states'][i]['g'] = int(col[1])
+					config['states'][i]['b'] = int(col[2])
+					config['states'][i]['on'] = 1
 			if i in updates:
 				continue
 			updates.append(i)
 
 	for i in updates:
-		update(config, i)
+		update(config, client, i)
 
 with open(config_path) as data:
 	config = json.load(data)
@@ -83,6 +106,9 @@ for light in config['lights']:
 	state['on'] = 0
 	state['bri'] = 255
 	config['states'].append(state)
+
+for i in range(0, len(config['states'])):
+	update(config, client, i)
 
 while True:
 	pass
