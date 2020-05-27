@@ -51,6 +51,8 @@ def callback(client, userdata, message):
 					config['states'][i]['on'] = 0
 				if payload == payload_on:
 					config['states'][i]['on'] = 1
+			if topic_id == 'bri_command':
+				config['states'][i]['bri'] = int(payload)
 			if i in updates:
 				continue
 			updates.append(i)
